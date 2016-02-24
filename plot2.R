@@ -1,6 +1,20 @@
-library(readr)
-library(dplyr)
-library(lubridate)
+pkgTest <- function(x)
+{
+  #
+  # this routine came from a solution in stackoverflow
+  # http://stackoverflow.com/questions/9341635/check-for-installed-packages-before-running-install-packages
+  #
+  if (!require(x,character.only = TRUE))
+  {
+    install.packages(x,dep=TRUE)
+    if(!require(x,character.only = TRUE)) stop("Package not found")
+  }
+  library(x, character.only = TRUE)
+}
+
+pkgTest('readr')
+pkgTest('dplyr')
+pkgTest('lubridate')
 
 start_dt <- ymd('2007/2/1')
 end_dt <- ymd('2007/2/2')
@@ -9,4 +23,8 @@ df <- read_csv2('household_power_consumption.txt', col_names = TRUE, na = '?', p
 dfs <- filter(df,dmy(Date) <= end_dt & dmy(Date) >= start_dt)
 dfs$datetime <- strptime(paste(dfs$Date, dfs$Time), format = '%d/%m/%Y %H:%M:%S')
 
-plot(x = dfs$datetime, y = dfs$Global_active_power, type='l', xaxt='n', ylab = 'Global Active Power (kilowatts)')
+png(filename = 'plot2.png', width=480, height=480, units='px')
+plot(x = dfs$datetime, y = dfs$Global_active_power, type='l', xlab='', ylab='Global Active Power (kilowatts)')
+dev.off()
+
+rm(list=ls())
